@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habit Tracker 2026</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1d2a24;--mute:#6b7771;--line:#e3e1d8;--acc:#2f8f6b;--accbg:#dff1e9;--warn:#c9622b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a17;--card:#1d2621;--ink:#e8efeb;--mute:#93a39b;--line:#2c3832;--acc:#4cc596;--accbg:#22392f;--warn:#e8895a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141a17;--card:#1d2621;--ink:#e8efeb;--mute:#93a39b;--line:#2c3832;--acc:#4cc596;--accbg:#22392f;--warn:#e8895a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:14px 14px 40px}
+h1{font-size:13px;letter-spacing:.14em;margin:0;color:var(--mute);font-weight:600}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nav{display:flex;align-items:center;gap:6px}
+.nav b{min-width:128px;text-align:center;font-size:18px}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 11px;cursor:pointer}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:12px;letter-spacing:.1em;color:var(--mute);margin:0 0 10px;font-weight:600}
+.big{display:flex;align-items:baseline;gap:8px}
+.big span{font-size:38px;font-weight:700;color:var(--acc)}
+.bar{height:8px;background:var(--accbg);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:6px;transition:width .25s}
+.wk{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.wk div{text-align:center;font-size:11px;color:var(--mute)}
+.wk b{display:block;font-size:14px;color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}
+.tabs button{flex:1;white-space:nowrap}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:100%}
+th,td{padding:5px 2px;text-align:center}
+th{font-size:11px;color:var(--mute);font-weight:500}
+th small{display:block;font-size:13px;color:var(--ink)}
+td.n{text-align:left;font-size:13px;padding-right:6px;min-width:96px}
+td.n small{display:block;color:var(--mute);font-size:11px}
+tr+tr td{border-top:1px solid var(--line)}
+.cb{appearance:none;-webkit-appearance:none;width:30px;height:30px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;margin:0;display:block;margin:auto}
+.cb:checked{background:var(--acc);border-color:var(--acc);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E");background-size:70%;background-position:center;background-repeat:no-repeat}
+.cb.today{border-color:var(--acc);border-width:2px}
+.cb:disabled{opacity:.25;cursor:default}
+.rank{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:13px}
+.rank em{font-style:normal;color:var(--mute);width:18px}
+.rank .nm{flex:0 0 42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .bar{flex:1}
+.rank span{width:40px;text-align:right;color:var(--mute);font-size:12px}
+.row{display:flex;gap:6px;margin:6px 0}
+input[type=text],input[type=number]{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0}
+input[type=text]{flex:1}
+input[type=number]{width:62px}
+.mute{color:var(--mute);font-size:12px}
+details summary{cursor:pointer;font-weight:600;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><h1>HABIT TRACKER</h1><button id="theme" aria-label="Toggle theme">◐</button></div>
+  <div class="top">
+    <div class="nav"><button id="prev" aria-label="Previous month">‹</button><b id="title"></b><button id="next" aria-label="Next month">›</button></div>
+    <button id="goto">Today</button>
+  </div>
+
+  <div class="card">
+    <h2>OVERALL PROGRESS</h2>
+    <div class="big"><span id="pct">0%</span><div class="mute" id="sub"></div></div>
+    <div class="bar" style="margin-top:8px"><i id="pbar" style="width:0"></i></div>
+    <div class="wk" id="weeks"></div>
+  </div>
+
+  <div class="card">
+    <h2>DAILY HABITS</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="scroll"><table id="grid"></table></div>
+  </div>
+
+  <div class="card">
+    <h2>TOP DAILY HABITS</h2>
+    <div id="rank"></div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>Edit habits</summary>
+      <p class="mute">Keep it to 5–10 habits. Tick a box only if you fully completed it — no partial credit.</p>
+      <div id="edit"></div>
+      <div class="row"><button class="pri" id="add">+ Add habit</button></div>
+      <div class="row"><button id="bk">Copy backup</button><button id="rs">Restore backup</button></div>
+      <div class="mute">Backup copies all your data as text. Paste it into Notes to keep it safe, or into Restore on another device.</div>
+    </details>
+  </div>
+</main>
+<script>
+const KEY="habit-tracker-v1";
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DOW=["S","M","T","W","T","F","S"];
+const DEFAULTS=[["Wake up without snoozing",30],["Social Media < 60 minutes",30],["Drink 2–3L of Water",30],["Read (5–10 pages)",20],["One proactive work action",30],["Movement/Exercise (30 minutes)",30],["Sleep before 11 PM",25],["Learn 1 work-relevant skill (15 min)",30],["Write 1 page/Journal",30],["Sleep before Midnight",30]];
+let S=load();
+const now=new Date();
+let Y=2026,M=Math.min(Math.max(now.getFullYear()===2026?now.getMonth():0,0),11),W=0;
+if(now.getFullYear()===2026){W=Math.min(4,Math.floor((now.getDate()-1)/7))}
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}
+  return{habits:DEFAULTS.map((d,i)=>({id:"h"+i,name:d[0],goal:d[1]})),checks:{},next:DEFAULTS.length}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=id=>document.getElementById(id);
+const mk=()=>Y+"-"+M;
+const dim=()=>new Date(Y,M+1,0).getDate();
+const get=(h)=>((S.checks[mk()]||{})[h]||[]);
+function toggle(h,d){const k=mk();S.checks[k]=S.checks[k]||{};const a=S.checks[k][h]||[];const i=a.indexOf(d);i<0?a.push(d):a.splice(i,1);S.checks[k][h]=a;save();render()}
+function isToday(d){return now.getFullYear()===Y&&now.getMonth()===M&&now.getDate()===d}
+function render(){
+  const n=dim(),hs=S.habits;
+  $("title").textContent=MONTHS[M]+" "+Y;
+  const goalOf=h=>Math.min(h.goal,n);
+  let done=0,goal=0;
+  hs.forEach(h=>{done+=Math.min(get(h.id).length,goalOf(h));goal+=goalOf(h)});
+  const p=goal?Math.round(done/goal*100):0;
+  $("pct").textContent=p+"%";$("pbar").style.width=p+"%";
+  $("sub").textContent=done+" of "+goal+" completed · "+(goal-done)+" left";
+  // weekly
+  const nw=Math.ceil(n/7);
+  $("weeks").innerHTML=Array.from({length:5},(_,w)=>{
+    if(w>=nw)return'<div>Wk '+(w+1)+'<b>–</b></div>';
+    const s=w*7+1,e=Math.min(n,s+6);let c=0;
+    hs.forEach(h=>get(h.id).forEach(d=>{if(d>=s&&d<=e)c++}));
+    const t=hs.length*(e-s+1);
+    return'<div>Wk '+(w+1)+'<b>'+(t?Math.round(c/t*100):0)+'%</b>'+c+'/'+t+'</div>'}).join("");
+  // tabs
+  if(W>=nw)W=nw-1;
+  $("tabs").innerHTML=Array.from({length:nw},(_,w)=>'<button class="'+(w===W?"on":"")+'" data-w="'+w+'">Week '+(w+1)+'</button>').join("");
+  // grid
+  const s=W*7+1,e=Math.min(n,s+6);
+  let t="<tr><th></th>";
+  for(let d=s;d<=e;d++)t+="<th>"+DOW[new Date(Y,M,d).getDay()]+"<small>"+d+"</small></th>";
+  t+="</tr>";
+  hs.forEach(h=>{const a=get(h.id);
+    t+='<tr><td class="n">'+esc(h.name)+'<small>'+a.length+'/'+goalOf(h)+'</small></td>';
+    for(let d=s;d<=e;d++)t+='<td><input type="checkbox" class="cb'+(isToday(d)?" today":"")+'" data-h="'+h.id+'" data-d="'+d+'" aria-label="'+esc(h.name)+' day '+d+'"'+(a.includes(d)?" checked":"")+'></td>';
+    t+="</tr>"});
+  $("grid").innerHTML=hs.length?t:"<tr><td class='mute'>No habits yet — add some below.</td></tr>";
+  // rank
+  const r=hs.map(h=>({name:h.name,c:Math.min(get(h.id).length,goalOf(h)),g:goalOf(h)})).sort((a,b)=>b.c/b.g-a.c/a.g||b.c-a.c).slice(0,10);
+  $("rank").innerHTML=r.map((x,i)=>'<div class="rank"><em>'+(i+1)+'</em><div class="nm">'+esc(x.name)+'</div><div class="bar"><i style="width:'+Math.round(x.c/x.g*100)+'%"></i></div><span>'+Math.round(x.c/x.g*100)+'%</span></div>').join("")||'<div class="mute">Nothing to rank yet.</div>';
+  renderEdit();
+}
+function renderEdit(){
+  const ed=$("edit");if(ed.contains(document.activeElement)&&document.activeElement.tagName==="INPUT")return;
+  ed.innerHTML=S.habits.map(h=>'<div class="row"><input type="text" value="'+esc(h.name)+'" data-e="name" data-h="'+h.id+'"><input type="number" min="1" max="31" value="'+h.goal+'" data-e="goal" data-h="'+h.id+'" title="Monthly goal"><button data-del="'+h.id+'" aria-label="Delete">✕</button></div>').join("")+'<div class="mute">Number = goal days per month.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.classList.contains("cb"))toggle(t.dataset.h,+t.dataset.d);
+  else if(t.dataset.e){const h=S.habits.find(x=>x.id===t.dataset.h);if(!h)return;
+    if(t.dataset.e==="name")h.name=t.value.trim()||h.name;else h.goal=Math.max(1,Math.min(31,+t.value||1));save();render()}});
+document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.w!==undefined){W=+t.dataset.w;render()}
+  else if(t.dataset.del){if(confirm("Delete this habit and its history?")){S.habits=S.habits.filter(h=>h.id!==t.dataset.del);save();render()}}});
+$("bk").onclick=async()=>{const s=JSON.stringify(S);try{await navigator.clipboard.writeText(s);alert("Backup copied. Paste it somewhere safe.")}catch(e){prompt("Copy this backup:",s)}};
+$("rs").onclick=()=>{const s=prompt("Paste your backup text:");if(!s)return;try{const o=JSON.parse(s);if(!Array.isArray(o.habits)||!o.checks)throw 0;S=o;save();render()}catch(e){alert("That doesn’t look like a valid backup.")}};
+$("add").onclick=()=>{S.habits.push({id:"h"+(S.next++),name:"New habit",goal:30});save();render()};
+$("prev").onclick=()=>{M--;if(M<0){M=11;Y--}W=0;render()};
+$("next").onclick=()=>{M++;if(M>11){M=0;Y++}W=0;render()};
+$("goto").onclick=()=>{Y=now.getFullYear();M=now.getMonth();W=Math.min(4,Math.floor((now.getDate()-1)/7));render()};
+$("theme").onclick=()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"};
+render();
+</script>
+</body>
+</html>
